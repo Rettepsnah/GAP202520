@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAP-Analyse: (EU) 2025/20</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="welcomeModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Ansvarsfraskrivelse</h2>
+        <p>
+            Dette verktøyet er ikke et offisielt produkt fra Luftfartstilsynet eller EASA.
+        </p>
+        <p>
+            Det tas forbehold om feil i innholdet.
+        </p>
+        <p>
+            Brukeren er selv ansvarlig for å sikre samsvar med gjeldende regelverk (EU) 2025/20.
+        </p>
+        <button class="modal-btn" onclick="closeModal()">Jeg forstår - start verktøyet</button>
+    </div>
+</div>
+
+<header>
+    <div class="header-left">
+        <img src="logo.png" alt="Logo" class="header-logo">
+        <div class="header-text-wrapper">
+            <h1>GAP-Analyse: (EU) 2025/20</h1>
+            <div class="version-text">Versjon 1.0.</div>
+        </div>
+    </div>
+    
+    <div style="display:flex; align-items:center; gap:10px;">
+        <span id="save-indicator">Lagret...</span>
+        <button class="btn btn-green" onclick="document.getElementById('fileInput').click()">📂 Åpne</button>
+        <button class="btn btn-blue" onclick="exportToJSON()">💾 Lagre Fil</button>
+        <button class="btn btn-orange" onclick="generateStatusPDF()">📄 Print Status PDF</button>
+        <button class="btn btn-gray" onclick="exportToCSV()">📊 CSV</button>
+        <button class="btn btn-red" onclick="resetAllData()">🗑️ Nullstill</button>
+        <input type="file" id="fileInput" accept=".json" onchange="importFromJSON(this)" style="display:none;">
+    </div>
+</header>
+
+<div class="tab-container">
+    <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" onclick="switchTab('part-org')">Annex I - PART-ORGH <span id="pct-part-org" class="tab-pct">0%</span></div>
+    <div class="tab" onclick="switchTab('part-ops')">Annex II - PART-GH.OPS <span id="pct-part-ops" class="tab-pct">0%</span></div>
+    <div class="tab" onclick="switchTab('follow-up')">Oppfølging <span id="count-action-items" class="tab-badge-red">0</span></div>
+</div>
+
+<div class="content-area">
+    
+    <div id="dashboard" class="tab-content active">
+        
+        <div class="instructions-box">
+            <div class="instructions-header" onclick="toggleInstructions()">
+                <span>ℹ️ Hvordan bruke verktøyet</span>
+                <span id="instruction-arrow">▼</span>
+            </div>
+            <div id="instructions-content" class="instructions-content">
+                <ol class="instructions-list">
+                    <li><strong>Navigasjon:</strong> Velg fanene "Annex I" eller "Annex II" for å se kravene.</li>
+                    <li><strong>Status:</strong> Marker status (OK, Delvis, Avvik, N/A) for hvert punkt.</li>
+                    <li><strong>Handlingsplan:</strong> Punkter med "Delvis" eller "Avvik" krever ansvarlig og frist. Sjekk fanen "Oppfølging" for sammendrag.</li>
+                    <li><strong>Datahåndtering:</strong> 
+                        <ul>
+                            <li><strong>Åpne:</strong> Last inn en tidligere lagret JSON-fil for å fortsette arbeidet.</li>
+                            <li><strong>Lagre Fil:</strong> Laster ned arbeidet ditt som en fil som kan åpnes senere.</li>
+                            <li><strong>CSV:</strong> Eksporterer data til Excel-format.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Print:</strong> Bruk "Print Status PDF" for å generere en statusrapport inkludert dashboard-statistikk og handlingsplan.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="dashboard-main-card">
+            
+            <div class="dashboard-header-row">
+                <div class="dashboard-title">Statusoversikt</div>
+                
+                <div class="progress-section">
+                    <div class="progress-labels">
+                        <span>Total Fremdrift</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div style="background:#eee; height:10px; border-radius:5px; overflow:hidden;">
+                        <div id="progress-bar" style="width:0%; height:100%; background:var(--accent-color); transition: width 0.5s;"></div>
+                    </div>
+                </div>
+
+                <div class="stats-summary">
+                    <div class="stat-item"><div class="stat-val" id="count-ok" style="color:var(--success-color)">0</div><div class="stat-desc">OK</div></div>
+                    <div class="stat-item"><div class="stat-val" id="count-partial" style="color:var(--warning-color)">0</div><div class="stat-desc">Delvis</div></div>
+                    <div class="stat-item"><div class="stat-val" id="count-fail" style="color:var(--danger-color)">0</div><div class="stat-desc">Avvik</div></div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div>
+                    <div class="annex-section-header" style="text-align:center;">Fordeling</div>
+                    <div class="chart-wrapper">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="annex-section-header">Annex I - PART-ORGH</div>
+                    <div id="table-stats-org"></div>
+                </div>
+
+                <div>
+                    <div class="annex-section-header">Annex II - PART-GH.OPS</div>
+                    <div id="table-stats-ops"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="part-org" class="tab-content"></div>
+    <div id="part-ops" class="tab-content"></div>
+    
+    <div id="follow-up" class="tab-content">
+        <h2>Punkter til oppfølging (Avvik & Delvis)</h2>
+        <div id="follow-up-container"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
