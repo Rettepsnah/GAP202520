@@ -63,10 +63,9 @@ header {
 }
 
 .header-logo {
-    height: 40px; /* Tilpasset høyde for å passe i headeren */
+    height: 65px; /* ØKT fra 40px for å gjøre logoen større */
     width: auto;
     object-fit: contain;
-    /* Fjernet hvit bakgrunn slik at hvit logo synes på blå header */
     padding: 2px;
     border-radius: 4px;
 }
@@ -76,7 +75,11 @@ header {
     flex-direction: column;
 }
 
-.header-text-wrapper h1 { margin: 0; font-size: 22px; line-height: 1.2; } 
+.header-text-wrapper h1 { 
+    margin: 0; 
+    font-size: 18px; /* REDUSERT fra 22px */
+    line-height: 1.2; 
+} 
 .version-text { font-size: 12px; opacity: 0.8; margin-top: 2px; }
 
 #save-indicator {
@@ -359,7 +362,21 @@ input[type="date"] {
     font-style: italic; 
 }
 
-.btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; color: white; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.1s; }
+/* Endret størrelse på knapper (mindre padding og font) */
+.btn { 
+    padding: 6px 12px; /* REDUSERT fra 8px 15px */
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 12px; /* REDUSERT fra 13px */
+    font-weight: 600; 
+    color: white; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    transition: transform 0.1s; 
+}
 .btn:active { transform: translateY(1px); }
 .btn-blue { background: #007bff; } .btn-green { background: #28a745; } .btn-gray { background: #6c757d; } .btn-red { background: #dc3545; }
 .btn-orange { background: #fd7e14; }
