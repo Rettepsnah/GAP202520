@@ -63,10 +63,9 @@ header {
 }
 
 .header-logo {
-    height: 40px; /* Tilpasset høyde for å passe i headeren */
+    height: 100px; /* ENDA STØRRE: Økt fra 80px til 100px */
     width: auto;
     object-fit: contain;
-    background: white; /* Hvit bakgrunn hvis logoen er transparent */
     padding: 2px;
     border-radius: 4px;
 }
@@ -74,9 +73,14 @@ header {
 .header-text-wrapper {
     display: flex;
     flex-direction: column;
+    padding-top: 15px; /* Lagt til padding for å flytte teksten ned */
 }
 
-.header-text-wrapper h1 { margin: 0; font-size: 22px; line-height: 1.2; } 
+.header-text-wrapper h1 { 
+    margin: 0; 
+    font-size: 18px; 
+    line-height: 1.2; 
+} 
 .version-text { font-size: 12px; opacity: 0.8; margin-top: 2px; }
 
 #save-indicator {
@@ -197,6 +201,25 @@ header {
     margin-bottom: 5px;
     color: #555;
     font-weight: 600;
+}
+
+/* Total Fremdrift Tekst */
+.progress-labels span:first-child {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+/* Total Fremdrift Prosent */
+#progress-percent {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--primary-color);
+}
+
+/* Fremdriftslinje Beholder */
+.progress-section > div:not(.progress-labels) {
+    height: 16px !important; /* Økt høyde fra 10px */
+    border-radius: 8px !important;
 }
 
 .stats-summary {
@@ -359,7 +382,21 @@ input[type="date"] {
     font-style: italic; 
 }
 
-.btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; color: white; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.1s; }
+/* Endret størrelse på knapper (mindre padding og font) */
+.btn { 
+    padding: 6px 12px; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 12px; 
+    font-weight: 600; 
+    color: white; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    transition: transform 0.1s; 
+}
 .btn:active { transform: translateY(1px); }
 .btn-blue { background: #007bff; } .btn-green { background: #28a745; } .btn-gray { background: #6c757d; } .btn-red { background: #dc3545; }
 .btn-orange { background: #fd7e14; }
