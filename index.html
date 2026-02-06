@@ -30,8 +30,15 @@
             <div class="version-text">Versjon 1.0.</div>
         </div>
     </div>
-    
-    <div style="display:flex; align-items:center; gap:10px;">
+</header>
+
+<div class="tab-container">
+    <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" onclick="switchTab('part-org')">Annex I - PART-ORGH <span id="pct-part-org" class="tab-pct">0%</span></div>
+    <div class="tab" onclick="switchTab('part-ops')">Annex II - PART-GH.OPS <span id="pct-part-ops" class="tab-pct">0%</span></div>
+    <div class="tab" onclick="switchTab('follow-up')">Oppfølging <span id="count-action-items" class="tab-badge-red">0</span></div>
+
+    <div style="margin-left: auto; display:flex; align-items:center; gap:8px; padding-bottom: 5px;">
         <span id="save-indicator">Lagret...</span>
         <button class="btn btn-green" onclick="document.getElementById('fileInput').click()">📂 Åpne</button>
         <button class="btn btn-blue" onclick="exportToJSON()">💾 Lagre Fil</button>
@@ -40,13 +47,6 @@
         <button class="btn btn-red" onclick="resetAllData()">🗑️ Nullstill</button>
         <input type="file" id="fileInput" accept=".json" onchange="importFromJSON(this)" style="display:none;">
     </div>
-</header>
-
-<div class="tab-container">
-    <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
-    <div class="tab" onclick="switchTab('part-org')">Annex I - PART-ORGH <span id="pct-part-org" class="tab-pct">0%</span></div>
-    <div class="tab" onclick="switchTab('part-ops')">Annex II - PART-GH.OPS <span id="pct-part-ops" class="tab-pct">0%</span></div>
-    <div class="tab" onclick="switchTab('follow-up')">Oppfølging <span id="count-action-items" class="tab-badge-red">0</span></div>
 </div>
 
 <div class="content-area">
@@ -77,43 +77,59 @@
         
         <div class="dashboard-main-card">
             
-            <div class="dashboard-header-row">
-                <div class="dashboard-title">Statusoversikt</div>
-                
-                <div class="progress-section">
+            <div class="dash-top-row">
+                <div class="dash-title-group">
+                    <div class="dashboard-title">Statusoversikt</div>
+                    <div class="countdown-badge" title="Ikrafttredelse: 28.03.2028">
+                        <span style="opacity:0.8;">Ikrafttredelse (28.03.28):</span> 
+                        <span id="weeks-countdown" style="font-weight:bold; color:var(--primary-color);">--</span> 
+                        uker igjen
+                    </div>
+                </div>
+
+                <div class="dash-main-progress">
                     <div class="progress-labels">
                         <span>Total Fremdrift</span>
                         <span id="progress-percent">0%</span>
                     </div>
-                    <div style="background:#eee; height:10px; border-radius:5px; overflow:hidden;">
-                        <div id="progress-bar" style="width:0%; height:100%; background:var(--accent-color); transition: width 0.5s;"></div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar" style="width:0%;"></div>
                     </div>
-                </div>
-
-                <div class="stats-summary">
-                    <div class="stat-item"><div class="stat-val" id="count-ok" style="color:var(--success-color)">0</div><div class="stat-desc">OK</div></div>
-                    <div class="stat-item"><div class="stat-val" id="count-partial" style="color:var(--warning-color)">0</div><div class="stat-desc">Delvis</div></div>
-                    <div class="stat-item"><div class="stat-val" id="count-fail" style="color:var(--danger-color)">0</div><div class="stat-desc">Avvik</div></div>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <div>
-                    <div class="annex-section-header" style="text-align:center;">Fordeling</div>
+            <div class="dash-content-grid">
+                
+                <div class="dash-col-visual">
+                    <div class="annex-section-header" style="text-align:center;">Grafisk Fordeling</div>
                     <div class="chart-wrapper">
                         <canvas id="statusChart"></canvas>
                     </div>
+                    
+                    <div class="kpi-container">
+                        <div class="kpi-card kpi-ok">
+                            <div class="kpi-val" id="count-ok">0</div>
+                            <div class="kpi-label">OK</div>
+                        </div>
+                        <div class="kpi-card kpi-partial">
+                            <div class="kpi-val" id="count-partial">0</div>
+                            <div class="kpi-label">Delvis</div>
+                        </div>
+                        <div class="kpi-card kpi-fail">
+                            <div class="kpi-val" id="count-fail">0</div>
+                            <div class="kpi-label">Avvik</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div>
+                <div class="dash-col-data">
                     <div class="annex-section-header">Annex I - PART-ORGH</div>
                     <div id="table-stats-org"></div>
-                </div>
 
-                <div>
-                    <div class="annex-section-header">Annex II - PART-GH.OPS</div>
+                    <div class="annex-section-header" style="margin-top: 20px;">Annex II - PART-GH.OPS</div>
                     <div id="table-stats-ops"></div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -128,5 +144,29 @@
 </div>
 
 <script src="script.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mål-dato: 28. mars 2028
+        const targetDate = new Date('2028-03-28');
+        const today = new Date();
+        
+        // Beregn differanse i millisekunder
+        const diffTime = targetDate - today;
+        
+        // Konverter til uker (avrundet oppover)
+        const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+        
+        // Vis i dashboard hvis datoen er i fremtiden
+        const el = document.getElementById('weeks-countdown');
+        if(el) {
+            if (diffWeeks > 0) {
+                el.innerText = diffWeeks;
+            } else {
+                el.innerText = "0";
+                el.parentElement.title = "Regelverket har trådt i kraft!";
+            }
+        }
+    });
+</script>
 </body>
 </html>
